@@ -3,7 +3,7 @@ Feature: Weather Stations API 3.0 creation using dynamic parameters
 Background:
 * url stationUrlBase
 
-Scenario Outline: Create stations and test using dynamic parameters
+Scenario Outline: Create stations using dynamic parameters
     * def stationData=
     """
     {
@@ -43,3 +43,29 @@ Scenario Outline: Create stations and test using dynamic parameters
     | 'station3'    | 'station created_3' | 56.66    |     54.54 | 300      |
 
 
+Scenario:Creating weather station using API post call
+
+    * def stationData =
+    """
+    {
+        "external_id": "SF_TEST001",
+        "name": "San Francisco Test Station",
+        "latitude": 37.76,
+        "longitude": -122.43,
+        "altitude": 150
+    }
+    """
+
+    Given path 'stations'
+    And param APPID = appid
+    And request stationData
+    When method post
+    Then status 201
+
+    * def stationId = response.ID
+
+    Given path 'stations', stationId
+    And param APPID = appid
+    When method get
+    Then status 200
+    And match response.name = 'San Francisco Test Station'
